@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-08-31T18:00:00Z",
+  "last_updated_by": "tobias",
+  "project": {
+    "name": "finanzplan_agent",
+    "state": "dev"
+  },
+  "decisions": [],
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "Setup GitHub Integration",
+      "owner": "tobias",
+      "status": "in_progress"
+    }
+  ],
+  "artifacts": []
+}
