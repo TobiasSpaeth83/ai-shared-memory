@@ -1,0 +1,12 @@
+# Private keys - NIEMALS committen!
+*.pem
+private-key.pem
+
+# Konfiguration mit sensiblen Daten
+config.json
+
+# Node modules
+node_modules/
+
+# Logs
+*.log

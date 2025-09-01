@@ -1,0 +1,22 @@
+{
+  "name": "AI-Memory-Sync-Tobias",
+  "description": "Shared memory sync for AI agents",
+  "url": "https://github.com/TobiasSpaeth83/ai-shared-memory",
+  "hook_attributes": {
+    "active": false
+  },
+  "public": false,
+  "default_permissions": {
+    "contents": "write",
+    "issues": "write",
+    "pull_requests": "write",
+    "actions": "read",
+    "metadata": "read"
+  },
+  "default_events": [
+    "push",
+    "pull_request",
+    "issues",
+    "issue_comment"
+  ]
+}

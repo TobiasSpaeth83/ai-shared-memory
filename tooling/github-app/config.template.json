@@ -1,0 +1,19 @@
+{
+  "app": {
+    "app_id": "YOUR_APP_ID_HERE",
+    "client_id": "YOUR_CLIENT_ID_HERE",
+    "installation_id": "YOUR_INSTALLATION_ID_HERE",
+    "private_key_path": "./private-key.pem"
+  },
+  "repository": {
+    "owner": "TobiasSpaeth83",
+    "repo": "ai-shared-memory"
+  },
+  "permissions": {
+    "contents": "write",
+    "issues": "write",
+    "pull_requests": "write",
+    "actions": "read",
+    "metadata": "read"
+  }
+}
