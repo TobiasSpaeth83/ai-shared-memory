@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "bwa.parse.input",
+  "version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "artifact_uri": {"type":"string", "pattern":"^artifact://case/[a-z0-9-]+/uploads/.+\\.(xlsx|csv)$"},
+    "account_system": {"type":"string", "enum":["SKR03","SKR04"]},
+    "periodicity": {"type":"string", "enum":["monthly"]},
+    "locale": {"type":"string", "default":"de-DE"}
+  },
+  "required": ["artifact_uri","account_system"],
+  "additionalProperties": false
+}

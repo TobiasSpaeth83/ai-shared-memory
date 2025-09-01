@@ -1,0 +1,13 @@
+name: Schema Validate (AJV)
+on:
+  pull_request:
+    paths: ['contracts/**/*.json', 'schemas/**/*.json']
+jobs:
+  ajv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci --prefix tooling/ci
+      - run: node tooling/ci/schema-validate.js

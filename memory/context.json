@@ -1,19 +1,13 @@
 {
   "version": "1.0.0",
-  "last_updated": "2025-08-31T18:00:00Z",
-  "last_updated_by": "tobias",
-  "project": {
-    "name": "finanzplan_agent",
-    "state": "dev"
-  },
-  "decisions": [],
+  "last_updated": "2025-09-01T00:00:00Z",
+  "last_updated_by": "human",
+  "project": { "name": "finanzplan_agent", "state": "discovery" },
+  "decisions": [
+    { "date": "2025-09-01", "title": "GitHub Kollab-Layer / Plattform SoT", "adr": "docs/adr/0001-github-kollab-layer.md" }
+  ],
   "tasks": [
-    {
-      "id": "T-001",
-      "title": "Setup GitHub Integration",
-      "owner": "tobias",
-      "status": "in_progress"
-    }
+    { "id": "T-001", "title": "Set up GitHub App + Checks", "owner": "tobias", "status": "doing" }
   ],
   "artifacts": []
 }

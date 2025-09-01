@@ -1,0 +1,16 @@
+name: Minerva Smoke
+on:
+  pull_request:
+    paths-ignore: ['**/*.md']
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      MINERVA_API_BASE: ${{ secrets.MINERVA_API_BASE }}
+      MINERVA_API_KEY:  ${{ secrets.MINERVA_API_KEY }}
+    steps:
+      - name: Ping Minerva API
+        run: |
+          if [ -z "$MINERVA_API_BASE" ]; then
+            echo 'MINERVA_API_BASE not set; skipping'; exit 0; fi
+          curl -sSf -H "Authorization: Bearer $MINERVA_API_KEY" "$MINERVA_API_BASE/health" | jq .
