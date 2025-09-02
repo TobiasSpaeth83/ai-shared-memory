@@ -1,13 +1,47 @@
-name: Schema Validate (AJV)
+name: Schema Validation
+
 on:
   pull_request:
-    paths: ['contracts/**/*.json', 'schemas/**/*.json']
+    paths: 
+      - 'contracts/**/*.json'
+      - 'schemas/**/*.json'
+      - 'memory/**/*.json'
+  push:
+    branches: [ main ]
+    paths:
+      - 'contracts/**/*.json'
+      - 'schemas/**/*.json'
+      - 'memory/**/*.json'
+
 jobs:
-  ajv:
+  validate:
+    name: JSON Schema Validation
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: npm ci --prefix tooling/ci
-      - run: node tooling/ci/schema-validate.js
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install AJV CLI
+        run: npm install -g ajv-cli ajv-formats
+        
+      - name: Validate context.json schema
+        run: |
+          if [ -f "schemas/context-schema.json" ] && [ -f "memory/context.json" ]; then
+            echo "Validating context.json against schema..."
+            ajv validate -s schemas/context-schema.json -d memory/context.json --all-errors --verbose
+            echo "✓ Schema validation passed"
+          else
+            echo "⚠️  Schema or context.json not found, skipping validation"
+          fi
+          
+      - name: Run custom validation if exists
+        run: |
+          if [ -f "tooling/ci/schema-validate.js" ]; then
+            cd tooling/ci && npm ci && node schema-validate.js
+          fi

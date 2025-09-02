@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Shared Memory - Collaborative AI Development Platform">
+    <title>AI Shared Memory - Collaborative Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1>AI Shared Memory</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#agents">Agents</a></li>
+                    <li><a href="#workflow">Workflow</a></li>
+                    <li><a href="#docs">Documentation</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="container">
+                <h2>Collaborative AI Development Platform</h2>
+                <p class="lead">Orchestrate multiple AI agents working together through shared memory and GitHub-based collaboration</p>
+                <div class="cta-buttons">
+                    <a href="#features" class="btn btn-primary">Explore Features</a>
+                    <a href="https://github.com/TobiasSpaeth83/ai-shared-memory" class="btn btn-secondary">View on GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="container">
+                <h2>Core Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>Shared Memory</h3>
+                        <p>Centralized context.json for task coordination and state management between AI agents</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>GitHub Integration</h3>
+                        <p>Native GitHub App with PR-based workflow, automated checks, and code review</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>MCP Server</h3>
+                        <p>Model Context Protocol server for seamless tool integration with Claude and other AI models</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>CI/CD Pipeline</h3>
+                        <p>Automated JSON validation, schema checks, and secret scanning on every PR</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="agents" class="agents-section">
+            <div class="container">
+                <h2>AI Agents</h2>
+                <div class="agents-grid">
+                    <div class="agent-card">
+                        <h3>Claude (Operator)</h3>
+                        <p><strong>Capabilities:</strong> Code generation, PR creation, code review, documentation</p>
+                        <p><strong>Role:</strong> Primary development agent with write access through PRs</p>
+                    </div>
+                    <div class="agent-card">
+                        <h3>ChatGPT (Architect)</h3>
+                        <p><strong>Capabilities:</strong> Planning, architecture, documentation, coordination</p>
+                        <p><strong>Role:</strong> Strategic planning and system design</p>
+                    </div>
+                    <div class="agent-card">
+                        <h3>Human (Supervisor)</h3>
+                        <p><strong>Capabilities:</strong> Final approval, strategic decisions, conflict resolution</p>
+                        <p><strong>Role:</strong> Oversight and quality assurance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="workflow-section">
+            <div class="container">
+                <h2>Collaboration Workflow</h2>
+                <ol class="workflow-steps">
+                    <li>
+                        <h3>Task Creation</h3>
+                        <p>Tasks are added to context.json with owner assignment (claude, chatgpt, human)</p>
+                    </li>
+                    <li>
+                        <h3>Agent Processing</h3>
+                        <p>Assigned agent picks up tasks with status "todo" and begins implementation</p>
+                    </li>
+                    <li>
+                        <h3>PR Creation</h3>
+                        <p>Changes are submitted via pull requests with automated checks</p>
+                    </li>
+                    <li>
+                        <h3>Review & Merge</h3>
+                        <p>Code review by CODEOWNERS, CI checks pass, then merge to main</p>
+                    </li>
+                    <li>
+                        <h3>State Update</h3>
+                        <p>Task status updated to "completed" in shared memory</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="docs" class="docs-section">
+            <div class="container">
+                <h2>Documentation</h2>
+                <div class="docs-links">
+                    <a href="/docs/github-app-setup.md" class="doc-link">GitHub App Setup Guide</a>
+                    <a href="/docs/adr/0001-github-kollab-layer.md" class="doc-link">Architecture Decision Records</a>
+                    <a href="/.claude/agents/" class="doc-link">Agent Configurations</a>
+                    <a href="/schemas/context-schema.json" class="doc-link">Context Schema</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AI Shared Memory Project. Built with collaborative AI.</p>
+            <p>Task ID: T-101 | Created by Claude | <a href="https://github.com/TobiasSpaeth83/ai-shared-memory">GitHub Repository</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
