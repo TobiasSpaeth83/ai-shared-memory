@@ -1,13 +1,20 @@
 {
   "version": "1.0.0",
-  "last_updated": "2025-09-03T11:41:38Z",
+  "last_updated": "2025-09-02T10:00:00Z",
   "last_updated_by": "claude",
+  "project": { 
+    "name": "finanzplan_agent", 
+    "state": "implementation",
+    "description": "AI-driven financial planning system with shared memory collaboration"
+  },
+  "metadata": {
+    "schema_version": "1.0.0",
+    "repository": "ai-shared-memory"
+  },
+  "decisions": [
+    { "date": "2025-09-01", "title": "GitHub Kollab-Layer / Plattform SoT", "adr": "docs/adr/0001-github-kollab-layer.md" }
+  ],
   "tasks": [
-    {
-      "id": "T-201",
-      "status": "todo",
-      "owner": "claude",
-      "description": "Erzuige eine hello.html Seite under site/public/test/hello.html und vereinbar ein <h1>Hello Render</h1> und ein Paragraph."
-    }
+    { "id": "T-001", "title": "Set up GitHub App + Checks", "owner": "tobias", "status": "in_progress", "description": "Configure GitHub App with proper permissions and CI/CD checks", "created_at": "2025-09-01T12:00:00Z" }
   ]
 }
