@@ -27,6 +27,7 @@ interface Context {
   last_updated_by: string;
   tasks: Task[];
   rev?: string;
+  sha?: string; // GitHub SHA for optimistic locking
 }
 
 class OperatorAgent {
@@ -67,7 +68,7 @@ class OperatorAgent {
     }
   }
 
-  async readContext(): Promise<Context> {
+  async readContext(): Promise<Context & { sha: string }> {
     try {
       const { data } = await this.octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
         owner: this.owner,
@@ -79,8 +80,9 @@ class OperatorAgent {
       const content = Buffer.from(data.content, 'base64').toString('utf-8');
       const context = JSON.parse(content);
       
-      // Add revision hash
-      context.rev = data.sha;
+      // Add revision hash and GitHub SHA
+      context.rev = createHash('sha256').update(content).digest('hex');
+      context.sha = data.sha; // GitHub's SHA for updates
       
       return context;
     } catch (error) {
@@ -223,19 +225,46 @@ Each webhook includes:
 `;
   }
 
-  private async createFile(branch: string, filePath: string, content: string, message: string) {
+  private async createFile(branch: string, filePath: string, content: string, message: string, sha?: string) {
     try {
-      await this.octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+      // First check if file exists to get SHA
+      let currentSha = sha;
+      if (!currentSha) {
+        try {
+          const { data: existingFile } = await this.octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+            owner: this.owner,
+            repo: this.repo,
+            path: filePath,
+            ref: branch
+          });
+          currentSha = existingFile.sha;
+        } catch (e) {
+          // File doesn't exist, that's ok for new files
+        }
+      }
+
+      const params: any = {
         owner: this.owner,
         repo: this.repo,
         path: filePath,
         message: message,
         content: Buffer.from(content).toString('base64'),
         branch: branch
-      });
-      console.log(`  ✅ File created: ${filePath}`);
-    } catch (error) {
-      console.error(`  ❌ Failed to create file ${filePath}:`, error);
+      };
+      
+      if (currentSha) {
+        params.sha = currentSha;
+      }
+
+      await this.octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', params);
+      console.log(`  ✅ File created/updated: ${filePath}`);
+    } catch (error: any) {
+      if (error.status === 409) {
+        console.log(`  ⚠️  Conflict detected for ${filePath}, will create conflict resolution PR`);
+      } else {
+        console.error(`  ❌ Failed to create file ${filePath}:`, error.message);
+      }
+      throw error;
     }
   }
 
@@ -315,12 +344,23 @@ Tool: github-mcp@1.0.0`;
         sha: mainRef.object.sha
       });
 
-      // Update context.json
+      // Check if there are actual changes
+      const originalContext = await this.readContext();
+      const updatedContent = JSON.stringify(context, null, 2);
+      const originalContent = JSON.stringify(originalContext, null, 2);
+      
+      if (updatedContent === originalContent) {
+        console.log(`  ⚠️  No changes needed for task ${task.id}, skipping update`);
+        return;
+      }
+
+      // Update context.json with SHA for conflict prevention
       await this.createFile(
         patchBranch, 
         'memory/context.json', 
-        JSON.stringify(context, null, 2),
-        patchMessage
+        updatedContent,
+        patchMessage,
+        context.sha // Pass SHA for optimistic locking
       );
 
       // Create patch PR
