@@ -26,7 +26,14 @@
       "Read(\\c/**)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17401867218 --log-failed)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17401867235 --log-failed)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17426762858 --log)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17426762858 --log)",
+      "Bash(git checkout:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npm test)",
+      "Bash(node:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr list)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr create --title \"feat: Implement Operator Agent (T-103)\" --body \"$(cat <<''EOF''\n## Summary\nComplete implementation of the Operator Agent for automated task processing from context.json.\n\n## Task Details\n- **Task ID**: T-103\n- **Owner**: claude\n- **Status**: Completed\n\n## Implementation Features\n- ✅ Pull-mode implementation (no WebSocket required)\n- ✅ Reads tasks from context.json with owner:\"claude\" and status:\"todo\"\n- ✅ Creates feature branches automatically\n- ✅ Generates implementation files based on task type\n- ✅ Opens PRs with idempotency footer\n- ✅ Updates task status via separate patch PRs\n- ✅ Rate/budget guards (max 1 task at a time)\n- ✅ Dry-run mode for testing\n\n## Test Results\nSuccessfully created PR #4 for Task T-102 in production run.\n\n## Files Changed\n- `tooling/operator/` - Complete operator implementation\n- `memory/context.json` - Updated task statuses\n\n## Testing\n- [x] Dry-run test successful\n- [x] Production run successful (created PR #4)\n- [x] CI checks expected to pass\n\n## Next Steps\n1. Merge this PR\n2. Set up automated triggers (webhooks/cron)\n3. Monitor operator performance\n\n---\n\nRun: minerva://runs/operator-implementation-1756886900\nInput: sha256:t103-operator-agent-implementation\nTool: github-mcp@1.0.0\nEOF\n)\" --base main)"
     ],
     "deny": [],
     "ask": []

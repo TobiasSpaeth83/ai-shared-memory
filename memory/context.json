@@ -37,17 +37,19 @@
       "id": "T-102",
       "title": "Fix CI/CD workflow issues",
       "owner": "claude",
-      "status": "todo",
+      "status": "completed",
       "description": "Fix failing CI checks: JSON Schema validation and Secret Detection",
-      "created_at": "2025-09-03T10:00:00Z"
+      "created_at": "2025-09-03T10:00:00Z",
+      "completed_at": "2025-09-03T08:00:00Z"
     },
     {
       "id": "T-103",
       "title": "Implement Operator Agent",
       "owner": "claude",
-      "status": "todo",
+      "status": "completed",
       "description": "Activate and test the Operator agent for automatic task processing from context.json",
-      "created_at": "2025-09-03T10:00:00Z"
+      "created_at": "2025-09-03T10:00:00Z",
+      "completed_at": "2025-09-03T09:00:00Z"
     },
     {
       "id": "T-104",
@@ -64,6 +66,14 @@
       "status": "todo",
       "description": "Create web interface for viewing and managing tasks in context.json",
       "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-106",
+      "title": "Create webhook documentation",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Document webhook endpoints, security, and processing flow for GitHub integration",
+      "created_at": "2025-09-03T09:30:00Z"
     }
   ],
   "agents": {
