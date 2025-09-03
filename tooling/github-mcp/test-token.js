@@ -1,7 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const { App } = require('@octokit/app');
-require('dotenv').config();
+import fs from 'fs';
+import path from 'path';
+import { App } from '@octokit/app';
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function testInstallationToken() {
   console.log('Testing GitHub App Installation Token...\n');
@@ -44,7 +45,7 @@ async function testInstallationToken() {
     console.log('✅ Installation token obtained successfully!');
     
     // Test the token by getting repository info
-    const { data: repo } = await octokit.rest.repos.get({
+    const { data: repo } = await octokit.request('GET /repos/{owner}/{repo}', {
       owner: 'TobiasSpaeth83',
       repo: 'ai-shared-memory'
     });

@@ -34,7 +34,7 @@ jobs:
         run: |
           if [ -f "schemas/context-schema.json" ] && [ -f "memory/context.json" ]; then
             echo "Validating context.json against schema..."
-            ajv validate -s schemas/context-schema.json -d memory/context.json --all-errors --verbose
+            ajv validate -s schemas/context-schema.json -d memory/context.json --all-errors --verbose -c ajv-formats
             echo "✓ Schema validation passed"
           else
             echo "⚠️  Schema or context.json not found, skipping validation"

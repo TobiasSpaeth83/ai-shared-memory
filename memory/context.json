@@ -27,9 +27,43 @@
       "id": "T-101",
       "title": "Create landing.html",
       "owner": "claude",
-      "status": "todo",
+      "status": "completed",
       "description": "Create a landing page with modern HTML5, CSS3, and JavaScript",
-      "created_at": "2025-09-02T11:30:00Z"
+      "created_at": "2025-09-02T11:30:00Z",
+      "completed_at": "2025-09-02T14:00:00Z",
+      "pr_number": 3
+    },
+    {
+      "id": "T-102",
+      "title": "Fix CI/CD workflow issues",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Fix failing CI checks: JSON Schema validation and Secret Detection",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-103",
+      "title": "Implement Operator Agent",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Activate and test the Operator agent for automatic task processing from context.json",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-104",
+      "title": "Create WebSocket real-time updates",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Implement WebSocket server for real-time context.json updates across agents",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-105",
+      "title": "Build task management UI",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Create web interface for viewing and managing tasks in context.json",
+      "created_at": "2025-09-03T10:00:00Z"
     }
   ],
   "agents": {

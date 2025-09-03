@@ -20,7 +20,12 @@
       "Bash(node:*)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr checks 3)",
       "Bash(timeout:*)",
-      "Read(C:\\Minervaproject\\minvervabusinesswebsite\\docs/**)"
+      "Read(C:\\Minervaproject\\minvervabusinesswebsite\\docs/**)",
+      "Bash(echo:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 3)",
+      "Read(\\c/**)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17401867218 --log-failed)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17401867235 --log-failed)"
     ],
     "deny": [],
     "ask": []
