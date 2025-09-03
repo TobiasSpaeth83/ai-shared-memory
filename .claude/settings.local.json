@@ -26,7 +26,13 @@
       "Read(\\c/**)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17401867218 --log-failed)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17401867235 --log-failed)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17426762858 --log)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 17426762858 --log)",
+      "Bash(git checkout:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npm test)",
+      "Bash(node:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr list)"
     ],
     "deny": [],
     "ask": []
