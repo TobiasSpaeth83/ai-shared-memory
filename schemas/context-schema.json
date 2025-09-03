@@ -1,0 +1,218 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/ai-shared-memory/schemas/context-schema.json",
+  "title": "AI Shared Memory Context Schema",
+  "description": "Schema for the shared memory context.json file",
+  "type": "object",
+  "required": ["version", "last_updated", "tasks"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the context file"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "last_updated_by": {
+      "type": "string",
+      "description": "Entity that made the last update"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Project name"
+        },
+        "state": {
+          "type": "string",
+          "enum": ["discovery", "planning", "implementation", "testing", "deployment", "maintenance"],
+          "description": "Current project state"
+        },
+        "description": {
+          "type": "string",
+          "description": "Project description"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "description": "Version of this schema"
+        },
+        "repository": {
+          "type": "string",
+          "description": "Repository name"
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "title"],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Decision date"
+          },
+          "title": {
+            "type": "string",
+            "description": "Decision title"
+          },
+          "adr": {
+            "type": "string",
+            "description": "Path to ADR document"
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "owner", "status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^T-\\d{3,}$",
+            "description": "Task identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Task title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed task description"
+          },
+          "owner": {
+            "type": "string",
+            "enum": ["claude", "chatgpt", "human", "tobias"],
+            "description": "Task owner"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["todo", "doing", "in_progress", "blocked", "completed", "cancelled"],
+            "description": "Task status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Task creation timestamp"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Task completion timestamp"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Task IDs this task depends on"
+          }
+        }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]+$": {
+          "type": "object",
+          "properties": {
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Agent capabilities"
+            },
+            "restrictions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Agent restrictions"
+            },
+            "last_active": {
+              "type": ["string", "null"],
+              "format": "date-time",
+              "description": "Last activity timestamp"
+            }
+          }
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "properties": {
+        "pr_requirements": {
+          "type": "object",
+          "properties": {
+            "min_approvals": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "required_checks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "auto_merge": {
+              "type": "boolean"
+            }
+          }
+        },
+        "file_limits": {
+          "type": "object",
+          "properties": {
+            "max_file_size_mb": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max_files_per_pr": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "blocked_extensions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

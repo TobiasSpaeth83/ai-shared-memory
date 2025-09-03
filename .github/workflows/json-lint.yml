@@ -1,0 +1,56 @@
+name: JSON Lint
+
+on:
+  pull_request:
+    paths:
+      - '**.json'
+      - '**.jsonc'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.json'
+      - '**.jsonc'
+
+jobs:
+  json-lint:
+    runs-on: ubuntu-latest
+    name: JSON Linting
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate JSON syntax
+        run: |
+          set -e
+          echo "Checking JSON files..."
+          mapfile -t files < <(git ls-files '*.json' '*.jsonc')
+          for f in "${files[@]}"; do
+            echo "Checking $f"
+            jq -e . "$f" > /dev/null || exit 1
+          done
+          
+      - name: Validate memory/context.json structure
+        run: |
+          if [ -f "memory/context.json" ]; then
+            echo "Validating context.json structure..."
+            jq -e '
+              if .version and .last_updated and .tasks then
+                if (.tasks | type) == "array" then
+                  .tasks | map(
+                    if .id and .title and .owner and .status then
+                      true
+                    else
+                      error("Invalid task structure")
+                    end
+                  ) | all
+                else
+                  error("tasks must be an array")
+                end
+              else
+                error("Missing required fields in context.json")
+              end
+            ' memory/context.json > /dev/null
+            echo "✓ context.json validation passed"
+          fi

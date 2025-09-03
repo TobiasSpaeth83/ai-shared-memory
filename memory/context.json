@@ -1,19 +1,94 @@
 {
   "version": "1.0.0",
-  "last_updated": "2025-08-31T18:00:00Z",
-  "last_updated_by": "tobias",
-  "project": {
-    "name": "finanzplan_agent",
-    "state": "dev"
+  "last_updated": "2025-09-02T10:00:00Z",
+  "last_updated_by": "claude",
+  "project": { 
+    "name": "finanzplan_agent", 
+    "state": "implementation",
+    "description": "AI-driven financial planning system with shared memory collaboration"
   },
-  "decisions": [],
+  "metadata": {
+    "schema_version": "1.0.0",
+    "repository": "ai-shared-memory"
+  },
+  "decisions": [
+    { "date": "2025-09-01", "title": "GitHub Kollab-Layer / Plattform SoT", "adr": "docs/adr/0001-github-kollab-layer.md" }
+  ],
   "tasks": [
+    { 
+      "id": "T-001", 
+      "title": "Set up GitHub App + Checks", 
+      "owner": "tobias", 
+      "status": "in_progress",
+      "description": "Configure GitHub App with proper permissions and CI/CD checks",
+      "created_at": "2025-09-01T12:00:00Z"
+    },
     {
-      "id": "T-001",
-      "title": "Setup GitHub Integration",
-      "owner": "tobias",
-      "status": "in_progress"
+      "id": "T-101",
+      "title": "Create landing.html",
+      "owner": "claude",
+      "status": "completed",
+      "description": "Create a landing page with modern HTML5, CSS3, and JavaScript",
+      "created_at": "2025-09-02T11:30:00Z",
+      "completed_at": "2025-09-02T14:00:00Z",
+      "pr_number": 3
+    },
+    {
+      "id": "T-102",
+      "title": "Fix CI/CD workflow issues",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Fix failing CI checks: JSON Schema validation and Secret Detection",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-103",
+      "title": "Implement Operator Agent",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Activate and test the Operator agent for automatic task processing from context.json",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-104",
+      "title": "Create WebSocket real-time updates",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Implement WebSocket server for real-time context.json updates across agents",
+      "created_at": "2025-09-03T10:00:00Z"
+    },
+    {
+      "id": "T-105",
+      "title": "Build task management UI",
+      "owner": "claude",
+      "status": "todo",
+      "description": "Create web interface for viewing and managing tasks in context.json",
+      "created_at": "2025-09-03T10:00:00Z"
     }
   ],
+  "agents": {
+    "claude": {
+      "capabilities": ["code_generation", "pr_creation", "code_review", "documentation"],
+      "restrictions": ["no_direct_push_to_main", "pr_only_workflow", "no_binary_files"],
+      "last_active": "2025-09-02T10:00:00Z"
+    },
+    "chatgpt": {
+      "capabilities": ["planning", "architecture", "documentation", "coordination"],
+      "restrictions": ["read_only_code_access"],
+      "last_active": "2025-09-02T09:00:00Z"
+    }
+  },
+  "policies": {
+    "pr_requirements": {
+      "min_approvals": 1,
+      "required_checks": ["json-lint", "schema-validate", "secret-scan"],
+      "auto_merge": false
+    },
+    "file_limits": {
+      "max_file_size_mb": 10,
+      "max_files_per_pr": 50,
+      "blocked_extensions": [".exe", ".dll", ".so", ".dylib"]
+    }
+  },
   "artifacts": []
 }

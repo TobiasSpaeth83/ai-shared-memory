@@ -1,0 +1,227 @@
+openapi: 3.1.0
+info:
+  title: GitHub Write (ai-shared-memory)
+  version: 1.1.0
+servers:
+  - url: https://api.github.com
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    CreatePullRequest:
+      type: object
+      required:
+        - title
+        - head
+        - base
+      properties:
+        title:
+          type: string
+        head:
+          type: string
+          description: branch name, e.g. feat/context-patch
+        base:
+          type: string
+          description: target branch, e.g. main
+        body:
+          type: string
+        draft:
+          type: boolean
+    IssueComment:
+      type: object
+      required:
+        - body
+      properties:
+        body:
+          type: string
+    UpsertContent:
+      type: object
+      required:
+        - message
+        - content
+      properties:
+        message:
+          type: string
+        content:
+          type: string
+          description: base64-encoded file content
+        branch:
+          type: string
+        sha:
+          type: string
+          description: blob sha when updating
+    CreateRef:
+      type: object
+      required:
+        - ref
+        - sha
+      properties:
+        ref:
+          type: string
+          description: Fully qualified ref e.g. refs/heads/feat/context-patch
+        sha:
+          type: string
+          description: Commit SHA to point the ref at
+security:
+  - bearerAuth: []
+paths:
+  /repos/{owner}/{repo}/pulls:
+    post:
+      operationId: createPull
+      summary: Create a Pull Request
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: repo
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePullRequest"
+      responses:
+        "201":
+          description: created
+        "422":
+          description: validation failed
+  /repos/{owner}/{repo}/issues/{number}/comments:
+    post:
+      operationId: commentIssue
+      summary: Comment on an Issue or PR
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: repo
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: number
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueComment"
+      responses:
+        "201":
+          description: created
+  /repos/{owner}/{repo}/contents/{path}:
+    get:
+      operationId: getContent
+      summary: Get file metadata (incl. sha)
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: repo
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
+    put:
+      operationId: upsertContent
+      summary: Create or update file contents
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: repo
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertContent"
+      responses:
+        "200":
+          description: updated
+        "201":
+          description: created
+  /repos/{owner}/{repo}/git/ref/{ref}:
+    get:
+      operationId: getRef
+      summary: Get a git ref (to retrieve base SHA)
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: repo
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: ref
+          required: true
+          schema:
+            type: string
+          description: e.g. heads/main
+      responses:
+        "200":
+          description: ok
+  /repos/{owner}/{repo}/git/refs:
+    post:
+      operationId: createRef
+      summary: Create a new git ref (branch)
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: repo
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRef"
+      responses:
+        "201":
+          description: created
+        "422":
+          description: validation failed

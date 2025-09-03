@@ -1,0 +1,33 @@
+# CODEOWNERS for AI Shared Memory Repository
+# This file defines who is responsible for code in this repository
+
+# Default owners for everything
+* @TobiasSpaeth83
+
+# Memory and shared context - critical for AI coordination
+/memory/ @TobiasSpaeth83
+/memory/context.json @TobiasSpaeth83
+
+# Contracts and schemas - structural integrity
+/contracts/** @TobiasSpaeth83
+/schemas/** @TobiasSpaeth83
+
+# CI/CD and workflows
+/.github/ @TobiasSpaeth83
+/.github/workflows/ @TobiasSpaeth83
+
+# MCP Server implementation
+/tooling/github-mcp/ @TobiasSpaeth83
+
+# Agent configurations
+/.claude/ @TobiasSpaeth83
+/.claude/agents/ @TobiasSpaeth83
+
+# Documentation and Architecture Decisions
+/docs/ @TobiasSpaeth83
+/docs/adr/** @TobiasSpaeth83
+
+# Security-sensitive files
+.env* @TobiasSpaeth83
+**/secrets/ @TobiasSpaeth83
+**/credentials/ @TobiasSpaeth83

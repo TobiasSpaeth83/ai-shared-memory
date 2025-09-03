@@ -1,15 +1,15 @@
-# AI Shared Memory
+# ai-shared-memory
 
-Shared context and collaboration platform for Claude and ChatGPT.
+Gemeinsames, leichtgewichtiges Kollaborations-Repo für Bots (Claude/ChatGPT) und Menschen.
+**Source of Truth** bleibt die Plattform (MySQL + S3). Hier liegen nur Contracts/ADRs/Manifeste und ein kleines `memory/context.json`.
 
-## Structure
-- `/contracts/` - API contracts and schemas
-- `/memory/` - Shared context (context.json)
-- `/docs/` - ADRs and documentation
-- `/tooling/` - MCP servers and actions
+## Checks
+- JSON Lint (jq)
+- Schema Validate (AJV)
+- Secret Scan (gitleaks)
+- Minerva Smoke (optional, via Secrets)
 
-## Setup Status
-- [ ] GitHub App
-- [ ] MCP Server (Claude)
-- [ ] Actions (ChatGPT)
-- [ ] CI/CD Checks
+## Konventionen
+- PR-only, mindestens 1 Approval
+- Commit-Footer mit `Run` / `Input (sha256)` / `Tool@ver`
+- Änderungen an `memory/context.json` als JSON Patch (RFC 6902) in der PR-Beschreibung

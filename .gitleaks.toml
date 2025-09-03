@@ -1,0 +1,32 @@
+# Gitleaks configuration file
+# https://github.com/gitleaks/gitleaks
+
+[allowlist]
+  description = "Allowlisted files and paths"
+  
+  # Ignore example/documentation files
+  paths = [
+    '''docs/chats_tickets/.*''',
+    '''.*\.example''',
+    '''.*\.sample''',
+    '''test/.*'''
+  ]
+
+  # Ignore specific commits that contain false positives
+  commits = [
+    "185de66657b15be0ed09936d3a4d29ca61e3cb05"
+  ]
+
+[[rules]]
+  description = "Private Key"
+  id = "private-key"
+  regex = '''(?i)(-----BEGIN( RSA| DSA| EC| OPENSSH)? PRIVATE KEY-----)'''
+  tags = ["key", "private"]
+  
+  [rules.allowlist]
+    description = "Allow private keys in documentation/example files"
+    paths = [
+      '''docs/.*''',
+      '''.*\.md$''',
+      '''.*\.example$'''
+    ]

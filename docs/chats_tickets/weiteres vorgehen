@@ -1,0 +1,501 @@
+super — hier ist die **konkrete, handlungsfähige Anleitung** für deinen Senior Developer („Claude 2“) in **Claude Code**, damit Claude über eine **GitHub-App** mit euch interagiert (lesen/schreiben, PRs eröffnen, kommentieren) und Tickets aus eurem „Shared Memory“ automatisch abarbeitet.
+
+Ich habe das so aufgebaut, dass er es 1:1 abarbeiten kann (inkl. Beispiel-Snippets).
+
+---
+
+# Phase 0 – Voraussetzungen (einmalig)
+
+* GitHub **Organisation/Repo**: `ai-shared-memory` (oder euer gewünschter Name).
+* Zugriffsschlüssel für Anthropic (Claude) & eure Umgebung als ENV Variablen.
+* Lokales Repo ausgecheckt.
+
+**Repo-Skelett (minimal)**
+
+```
+/memory/context.json
+/docs/adr/0001-github-kollab-sot-plattform.md
+/workflows/json-lint.yml
+/workflows/schema-validate.yml
+/workflows/secret-scan.yml
+CODEOWNERS
+PULL_REQUEST_TEMPLATE.md
+```
+
+> Warum so? „Shared Memory“ via `context.json`, ADRs/Policies als Markdown, und sofortige CI-Checks. (Plan→Act→Observe, Artefakt-Hand-off)&#x20;
+
+---
+
+# Phase 1 – GitHub App (Service-Identität für Claude)
+
+1. **App anlegen** (GitHub → Settings → Developer settings → GitHub Apps)
+
+   * **Permissions** minimal:
+
+     * Repository contents: **Read & write**
+     * Pull requests: **Read & write**
+     * Metadata: **Read**
+   * **Webhook** (optional, wenn ihr euren Server triggt): `POST https://<eure-domain>/webhooks/github` + Secret
+   * **Installation**: Nur auf `ai-shared-memory` (zunächst)
+
+2. **Secrets/ENV** hinterlegen (für Claude Code/MCP-Server)
+
+   * `GITHUB_APP_ID`
+   * `GITHUB_INSTALLATION_ID`
+   * `GITHUB_PRIVATE_KEY` (PEM)
+   * Optional: `REPO_ALLOWLIST=org/ai-shared-memory`
+
+3. **Branch-Protection & Checks**
+
+   * Main schützen; min. **1 Approval**
+   * Required Checks: `json-lint`, `schema-validate`, `secret-scan`
+   * **CODEOWNERS**: z. B. `/contracts/** @euer-team`, `/memory/** @euer-team`
+
+> Governance/Review via PRs ist der Sinn der GitHub-Schicht; große/binary Artefakte bleiben bei euch (S3/Plattform).&#x20;
+
+---
+
+# Phase 2 – MCP-GitHub-Server (Claude’s Werkzeuge)
+
+Claude Code ruft Tools über **MCP** auf. Wir stellen einen **github-mcp** bereit, der genau die Operationen kapselt, die Claude braucht. (MCP = standardisierte Tool-Adapter; Claude fährt Plan→Act→Observe und ruft Tools deterministisch auf.)&#x20;
+
+**Tool-Surface (v1)**
+
+* `repo.read_tree(owner, repo, sha?, path?)`
+* `code.search(owner, repo, query)`
+* `commit.files(owner, repo, branch, files[], message)`  // `files[] = {path, content_b64, mode}`
+* `pr.open(owner, repo, base, head, title, body, draft?)`
+* `pr.comment(owner, repo, number, body)`
+
+**Policies**
+
+* Repo-Allowlist, Max 50 Files/PR, keine Binaries, PR-only (kein Direkt-Push), Idempotenz-Footer in PR-Body:
+
+  ```
+  Run: minerva://runs/<id>
+  Input: sha256:<hash>
+  Tool: github-mcp@1.0.0
+  ```
+
+> Warum MCP-Server? Saubere Tool-Schiene statt ad-hoc API-Calls; Logs/Artefakte/Status lassen sich robust übergeben.&#x20;
+
+---
+
+# Phase 3 – Claude Code Konfiguration
+
+In **Claude Code** (lokal oder auf dem Build-Server) wird der MCP-Server registriert und Sub-Agents definiert.
+
+## 3.1 `.claude/settings.json` (oder projektweit `.claude/`)
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "node",
+      "args": ["./tooling/github-mcp/dist/index.js"],
+      "env": {
+        "GITHUB_APP_ID": "…",
+        "GITHUB_INSTALLATION_ID": "…",
+        "GITHUB_PRIVATE_KEY": "…",
+        "REPO_ALLOWLIST": "org/ai-shared-memory"
+      }
+    }
+  }
+}
+```
+
+## 3.2 Sub-Agents (Aufgaben-spezifisch)
+
+`.claude/agents/operator.md` (Dirigent, nur Koordination/Review)
+
+```
+# Agent: operator
+## Ziel
+Koordiniere Aufgaben aus /memory/context.json. Erzeuge ausschließlich Diffs oder PRs (über github-MCP).
+## Tools
+- github
+## Exit-Checks
+- PR geöffnet ODER Kommentar mit glasklarem Next-Step
+## Nicht tun
+- Keine großen Binärdateien
+```
+
+`.claude/agents/frontend.md` (Web/HTML-Erstellung)
+
+```
+# Agent: frontend
+## Ziel
+Erzeuge/überarbeite landing.html (+ CSS/JS), Lighthouse ≥ 90 lokal.
+## Tools
+- github
+## Exit-Checks
+- htmlhint/lighthouse lokal grün
+```
+
+> Sub-Agents isolieren Kontext/Tools & sorgen für enge Guardrails.&#x20;
+
+---
+
+# Phase 4 – „Shared Memory“ & Trigger
+
+Wir nutzen `memory/context.json` (klein, patch-bar) als **Ticket-Quelle**: neue Tasks mit `owner:"claude"` triggern Arbeit.
+
+**`memory/context.json` Minimal-Schema**
+
+```json
+{
+  "version":"1.0.0",
+  "last_updated":"<ISO>",
+  "tasks":[
+    {"id":"T-101","title":"Create landing.html","owner":"claude","status":"todo"}
+  ]
+}
+```
+
+**PR-Vorlage (PULL\_REQUEST\_TEMPLATE.md)** – JSON Patch beifügen
+
+````md
+### Summary
+Add task for Claude: Create landing.html
+
+### JSON Patch
+```json
+[
+  {"op":"add","path":"/tasks/-","value":{"id":"T-101","title":"Create landing.html","owner":"claude","status":"todo"}}
+]
+````
+
+````
+
+> Hand-off über Dateien/State ist robuster als stille Chat-Wechsel: Fortschritt ist an Artefakte & Checks gebunden. :contentReference[oaicite:5]{index=5}
+
+---
+
+# Phase 5 – Eventing (optional, aber empfohlen)
+**Zwei Wege**, Claude zu „starten“:
+
+1) **Pull-Modus (einfach)**  
+   Der Operator-Agent in Claude Code schaut bei Start in `memory/context.json`, filtert `owner:"claude"` & `status:"todo"`, arbeitet sie ab (PR erstellt).
+
+2) **Webhook-Modus (automatisch)**  
+   GitHub Webhook → euer Server (`/webhooks/github`) → legt einen **Job** `claude_task` an → startet eine **Claude-Run** (Anthropic API) mit Tool-Zugriff **serverseitig**. (Kein lokales Fenster nötig; Logs/Artefakte zurück ins Repo/Plattform). :contentReference[oaicite:6]{index=6}
+
+---
+
+# Phase 6 – Parallelität & Schutzgeländer
+- **Git-Worktrees** für parallele Feature-Zweige (mehrere Claude-Instanzen isoliert):  
+  ```bash
+  git worktree add ../feat-landing feat/landing
+  git worktree add ../feat-backend feat/backend
+````
+
+(Skaliert mit Claude Code gut; jede Instanz arbeitet sauber getrennt.)&#x20;
+
+* **CI auf PR**: `json-lint`, `schema-validate`, `secret-scan`, optional Playwright/Lighthouse für HTML-Artefakte.
+* **Pre-commit Hooks** (lokal): lint/typecheck/fast-tests. (Siehe Guard-Rails)&#x20;
+
+---
+
+# Phase 7 – „Happy Path“ (End-to-End Beispiel)
+
+1. Tobias sagt im Chat: „Ticket für `landing.html` anlegen“.
+2. Ich (ChatGPT) erstelle PR mit JSON-Patch → `/memory/context.json` (`owner:"claude"`).
+3. **Trigger**: Pull- oder Webhook-Modus startet Claude.
+4. **Claude (frontend-Agent)**:
+
+   * liest Task,
+   * erzeugt `landing.html` (+ `style.css`) als Branch `feat/web/landing`,
+   * öffnet **PR** mit Idempotenz-Footer.
+5. **CI** läuft (htmlhint/lighthouse/json-lint).
+6. Review → Merge. Fertig.
+
+---
+
+## Cheatsheet für Claude 2 (Kurzfassung)
+
+* [ ] GitHub **App** anlegen, minimale Scopes, Installation auf Ziel-Repo, Secrets als ENV.
+* [ ] Repo strukturieren (`/memory/context.json`, ADRs, CI-Workflows, CODEOWNERS).
+* [ ] **github-mcp** implementieren (Tools: read\_tree, code.search, commit.files, pr.open, pr.comment) — Auth via App-Installation-Token; Repo-Allowlist.
+* [ ] **Claude Code** konfigurieren: `.claude/settings.json` + Sub-Agents (`operator.md`, `frontend.md`, …).
+* [ ] Trigger definieren: Pull-Modus (einfach) **oder** Webhook→Server→Job (automatisch).
+* [ ] Worktrees für paralleles Arbeiten; CI-Guardrails aktiv.
+
+Damit kann Claude über Claude Code **sofort** via GitHub-App mit euch arbeiten (lesen/schreiben, PR-Fluss, Checks), und Tickets aus dem Shared Memory werden **automatisch** aufgegriffen.
+Wenn du willst, liefere ich dir noch ein **Skeleton** für den `github-mcp` (TypeScript `tools/list`/`tools/call`) und die drei **CI-Workflow-Dateien** (`json-lint.yml`, `schema-validate.yml`, `secret-scan.yml`) – direkt eincheckbar.
+
+
+
+
+----
+
+chatgpt sagt weiter:
+
+in /memory/context.json eine Task T-101 für owner:"claude" anlegt (JSON-Patch siehe unten).
+
+Prüfe, dass die Required Checks (json-lint, schema-validate, secret-scan) laufen.
+
+Operator-/Frontend-Agenten: Operator sieht T-101 und triggert Frontend → erstelle landing.html in Branch feat/web/landing, PR öffnen.
+
+Idempotenz-Footer im PR-Body nicht vergessen (Run/Hash/Tool).
+Melde kurz den Status und häng die PR-Links dran. Danke!
+
+.env (erwartete Variablen)
+
+GITHUB_APP_ID=xxxx
+GITHUB_INSTALLATION_ID=xxxx
+# PEM als eine Zeile (escaped) ODER Pfad:
+GITHUB_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n....\n-----END PRIVATE KEY-----"
+REPO_ALLOWLIST=org/ai-shared-memory
+GITHUB_DEFAULT_OWNER=org
+GITHUB_DEFAULT_REPO=ai-shared-memory
+
+
+JSON-Patch für T-101 (PR-Beschreibung anhängen)
+
+[
+  {"op":"add","path":"/tasks/-",
+   "value":{"id":"T-101","title":"Create landing.html","owner":"claude","status":"todo"}}
+]
+
+Detail-Checkliste für Claude 2
+A) MCP-Server lauffähig machen
+
+cd tooling/github-mcp && npm install && npm run build
+
+Start (Beispiel):
+
+stdio-Modus (empfohlen für Claude Code): node dist/index.js
+
+Optional health-flag implementieren (node dist/index.js --health) und einmal lokal prüfen.
+
+JWT→Installation-Token: sicherstellen, dass der Server aus GITHUB_APP_ID + GITHUB_PRIVATE_KEY einen Installation-Token holt und cached (z. B. 50–55 min). Keine direkten PATs.
+
+B) Claude Code binden
+
+.claude/settings.json zeigt auf node ./tooling/github-mcp/dist/index.js und setzt die ENV-Variablen.
+
+Sub-Agents (operator.md, frontend.md) vorhanden – Operator darf nur PRs/Kommentare/Diffs, Frontend erzeugt HTML/CSS/JS.
+
+Einmal „tools/list“ aufrufen (in Claude Code) und die erwarteten fünf Tools sehen.
+
+C) Branch-Protection & Checks (Repo)
+
+Branch main geschützt, min. 1 Approval.
+
+Required Checks: json-lint, schema-validate, secret-scan (alle drei grün bei Test-PR).
+
+CODEOWNERS greift für /memory/** und /contracts/**.
+
+D) Smoke-Test (End-to-End)
+
+PR #1 (Task anlegen)
+
+PULL_REQUEST_TEMPLATE nutzen, JSON-Patch anhängen (T-101).
+
+Prüfen: Checks triggern, schema-validate validiert memory/context.json gegen schemas/context-schema.json.
+
+Operator-Lauf
+
+Operator liest memory/context.json, erkennt owner:"claude"/status:"todo", schiebt Sub-Agent Frontend an.
+
+PR #2 (Landing Page)
+
+Frontend erzeugt landing.html (+ ggf. style.css) im Branch feat/web/landing, öffnet PR.
+
+PR-Body enthält Idempotenz-Footer:
+
+Run: minerva://runs/<id>
+Input: sha256:<hash>
+Tool: github-mcp@1.0.0
+
+
+Checks laufen (json-lint/secret-scan greifen; optional html-lint).
+
+Review & Merge
+
+Nach Merge: memory/context.json kann Taskstatus auf done aktualisieren (PR #3 via Operator).
+
+E) Fehlerbilder & Fixes
+
+401/403 bei GitHub: Installation-Token fehlen/abgelaufen → Token-Refresh prüfen, App-Installation auf Repo bestätigen.
+
+Private Key Format: PEM-Zeilenumbrüche sauber escapen (\n) oder Pfad statt Inline-String verwenden.
+
+Schema-Fehler: schemas/context-schema.json und json-lint.yml logs prüfen; Patch korrigieren.
+
+Operator sieht Task nicht: Pfad /tasks/*, Feldnamen owner/status exakt prüfen; ggf. project.state in context.json auf dev setzen, falls Agenten danach filtern.
+
+F) Optional (nice-to-have, später)
+
+Webhook-Modus: GitHub → /webhooks/github → Plattform-Worker startet „Claude Runner“ serverseitig (ohne Claude-Desktop offen).
+
+htmlhint/lighthouse kleiner CI-Job für Webartefakte.
+
+Auto-Merge-Heuristik für context.json (JSON-Patch-Merge, Konflikte → Review-Stop).
+
+Wenn du das so weiterleitest, weiß Claude 2 exakt, was als Nächstes zu tun ist, und ihr habt in <1 Stunde den ersten vollständigen Lauf: Task-PR → Agent-PR (landing.html) → Checks → Merge.
+
+
+----
+
+.env sicher ausfüllen (lokal bei Claude 2)
+
+In tooling/github-mcp/.env (nicht committen!):
+
+# Pflicht
+GITHUB_APP_ID=123456
+GITHUB_INSTALLATION_ID=9876543
+
+# Variante A: Pfad zur PEM-Datei (empfohlen)
+GITHUB_PRIVATE_KEY_PATH=/absolute/pfad/zu/github-app.private-key.pem
+
+# Variante B: Inline (nur wenn Pfad nicht geht; \n sauber escapen)
+# GITHUB_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqh...\n-----END PRIVATE KEY-----"
+
+# Repo-Grenzen
+REPO_ALLOWLIST=org/ai-shared-memory
+GITHUB_DEFAULT_OWNER=org
+GITHUB_DEFAULT_REPO=ai-shared-memory
+
+
+Tipp: Nutzt Variante A (Dateipfad). Inline-PEMs sind fehleranfällig (Zeilenumbrüche).
+
+2) Testskript: Installation-Token prüfen
+
+Lege eine kleine Probe an (z. B. tooling/github-mcp/scripts/test-installation-token.ts):
+
+import fs from "node:fs";
+import jwt from "jsonwebtoken"; // npm i jsonwebtoken
+import fetch from "node-fetch"; // npm i node-fetch@2
+
+const appId = process.env.GITHUB_APP_ID!;
+const instId = process.env.GITHUB_INSTALLATION_ID!;
+const pkPath = process.env.GITHUB_PRIVATE_KEY_PATH;
+const pkInline = process.env.GITHUB_PRIVATE_KEY;
+
+const privateKey = pkPath ? fs.readFileSync(pkPath, "utf8") : pkInline!;
+if (!appId || !instId || !privateKey) {
+  throw new Error("Missing env vars");
+}
+
+// 1) App JWT erzeugen
+const now = Math.floor(Date.now() / 1000);
+const jwtToken = jwt.sign(
+  { iat: now - 60, exp: now + 9 * 60, iss: appId },
+  privateKey,
+  { algorithm: "RS256" }
+);
+
+// 2) Installation Access Token holen
+(async () => {
+  const res = await fetch(
+    `https://api.github.com/app/installations/${instId}/access_tokens`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        Accept: "application/vnd.github+json",
+      },
+    }
+  );
+  if (!res.ok) {
+    console.error(await res.text());
+    throw new Error(`Failed to get installation token: ${res.status}`);
+  }
+  const json: any = await res.json();
+  console.log("OK: token expires_at =", json.expires_at);
+})();
+
+
+Run:
+
+cd tooling/github-mcp
+npm i jsonwebtoken node-fetch@2
+node -r dotenv/config scripts/test-installation-token.ts
+
+
+Erwartung: OK: token expires_at = .... Wenn 401/403 → App-Installation/IDs/Key prüfen.
+
+3) MCP-Server starten & in Claude Code verdrahten
+
+Build & Start:
+
+cd tooling/github-mcp
+npm install
+npm run build
+node dist/index.js
+
+
+.claude/settings.json (lokal) zeigt auf den Startbefehl und übernimmt ENV (nicht committen):
+
+{
+  "mcpServers": {
+    "github": {
+      "command": "node",
+      "args": ["./tooling/github-mcp/dist/index.js"],
+      "env": {
+        "GITHUB_APP_ID": "${env:GITHUB_APP_ID}",
+        "GITHUB_INSTALLATION_ID": "${env:GITHUB_INSTALLATION_ID}",
+        "GITHUB_PRIVATE_KEY_PATH": "${env:GITHUB_PRIVATE_KEY_PATH}",
+        "REPO_ALLOWLIST": "org/ai-shared-memory",
+        "GITHUB_DEFAULT_OWNER": "org",
+        "GITHUB_DEFAULT_REPO": "ai-shared-memory"
+      }
+    }
+  }
+}
+
+
+Check in Claude Code: tools/list sollte repo.read_tree, code.search, commit.files, pr.open, pr.comment zeigen.
+
+4) Smoke-Test (End-to-End)
+
+Test-PR anlegen (Task T-101 in memory/context.json via JSON-Patch):
+
+[
+  {"op":"add","path":"/tasks/-",
+   "value":{"id":"T-101","title":"Create landing.html","owner":"claude","status":"todo"}}
+]
+
+
+→ PR öffnet sich, Required Checks (json-lint, schema-validate, secret-scan) laufen.
+
+Operator/Frontend-Agent in Claude Code:
+
+Operator erkennt owner:"claude", triggert Frontend.
+
+Frontend erstellt Branch feat/web/landing und committet landing.html (+ optional style.css), dann pr.open.
+
+PR-Body Footer (Idempotenz):
+
+Run: minerva://runs/<id>
+Input: sha256:<hash>
+Tool: github-mcp@1.0.0
+
+
+Review → Merge. Danach optional Task-Status auf done patchen (PR #3).
+
+5) Sicherheit & Good Practices
+
+Teile keine PEM/Token im Chat/Canvas/Notion. Wenn du das doch getan hast: GitHub App → Generate new private key, alten Key revoken und .env aktualisieren.
+
+Git ignorieren: .env, PEM-Dateien, .claude/settings.json in .gitignore.
+
+Secret-Manager (später): 1Password, Doppler, AWS SSM. Lokal: direnv oder mise für ENV-Verteilung.
+
+Scopes minimal halten, App nur auf ein Repo installieren.
+
+Kurzform zum Weiterleiten an Claude 2
+
+Wir haben die App & Credentials bereits. Bitte .env lokal setzen (kein Commit), MCP-Server builden und starten, in Claude Code binden, dann den Smoke-Test fahren (Task-PR → Agent-PR mit landing.html).
+Falls du einen Key im Chat siehst: Ignorieren und stattdessen Key rotieren; nur lokal/Secret-Store verwenden.
+
+Wenn du willst, schreibe ich dir jetzt .env.example, .gitignore-Erweiterung und eine kurze docs/SECRETS.md – fertig zum Einchecken (ohne echte Secrets).
+
+DAten für .env:
+
+GITHUB_APP_ID=1878945
+GITHUB_INSTALLATION_ID=83805063
+CLIENT_ID=Iv23libbCgpkBoFRirGR
+GITHUB_OWNER=TobiasSpaeth83
+GITHUB_REPO=ai-shared-memory
