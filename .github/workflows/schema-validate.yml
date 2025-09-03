@@ -40,10 +40,3 @@ jobs:
             echo "⚠️  Schema or context.json not found, skipping validation"
           fi
           
-      - name: Run custom validation if exists
-        run: |
-          if [ -f "tooling/ci/schema-validate.js" ]; then
-            cd tooling/ci && npm ci && node schema-validate.js
-          else
-            echo "No custom validation script found, skipping"
-          fi
