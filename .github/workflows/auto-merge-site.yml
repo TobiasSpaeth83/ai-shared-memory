@@ -8,18 +8,11 @@ permissions:
   contents: write
   pull-requests: write
 jobs:
-  auto_merge:
+  set_auto_merge:
     if: contains(github.event.pull_request.labels.*.name, 'auto-merge')
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for checks to be green
-        uses: lewagon/wait-on-check-action@v1.3.3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-          allowed-conclusions: success
-      - name: Merge (squash)
-        run: gh pr merge ${{ github.event.pull_request.number }} --squash --auto
+      - name: Enable GitHub auto-merge (squash) and exit
+        run: gh pr merge ${{ github.event.pull_request.number }} --squash --auto --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
