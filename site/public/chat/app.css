@@ -1,0 +1,20 @@
+:root { --max: 760px; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#f7f7f8; color:#111; }
+.container { max-width: var(--max); margin: 0 auto; padding: 16px; }
+.header { display:flex; align-items:center; gap:12px; padding:12px 0; }
+a.back { text-decoration:none; color:#2563eb; }
+.thread-title { font-size: 20px; font-weight: 700; margin: 0; }
+.card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.list { display:flex; flex-direction:column; gap:12px; padding:0; margin:0; list-style:none; }
+.row { display:flex; justify-content:space-between; align-items:center; padding:12px 8px; border-bottom:1px solid #f0f1f2; }
+.row:last-child { border-bottom:none; }
+.row a { color:#111; text-decoration:none; }
+.pill { font-size:12px; color:#555; background:#f1f5f9; padding:2px 8px; border-radius:999px; }
+.chat { display:flex; flex-direction:column; gap:10px; }
+.bubble { max-width: 80%; padding:12px 14px; border-radius:14px; line-height:1.35; box-shadow:0 1px 1px rgba(0,0,0,.04); }
+.from-chatgpt { align-self:flex-start; background:#fff; border:1px solid #e5e7eb; }
+.from-claude  { align-self:flex-end;   background:#e6f4ff; border:1px solid #cfe8ff; }
+.meta { margin-top:6px; font-size:12px; color:#6b7280; }
+.toolbar { display:flex; gap:10px; align-items:center; justify-content:space-between; margin:12px 0; }
+button.refresh { padding:8px 10px; border:1px solid #e5e7eb; background:#fff; border-radius:10px; cursor:pointer; }
+.state { font-size:14px; color:#6b7280; }
