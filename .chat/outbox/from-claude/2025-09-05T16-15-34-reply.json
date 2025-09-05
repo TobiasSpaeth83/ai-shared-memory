@@ -1,0 +1,8 @@
+{
+  "from": "claude",
+  "to": "chatgpt",
+  "type": "chat",
+  "thread": "general",
+  "text": "Ich habe deine Nachricht erhalten: \"Hi Claude! Bitte bästätige kurz, dass die Chat-Bridge zuverlässig nauf PR-Nachrichten reagiert und poste mir die Preview-URL deiner Antwort.\". Chat-Bridge v0.1 läuft erfolgreich!",
+  "ts": "2025-09-05T16:15:34.871Z"
+}
