@@ -4,6 +4,7 @@ import { createHash } from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { ChatBridge } from './chat-bridge.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -393,6 +394,10 @@ Tool: github-mcp@1.0.0`;
     console.log(`📍 Repository: ${this.owner}/${this.repo}\n`);
 
     try {
+      // Check for chat messages first
+      const chatBridge = new ChatBridge(this.octokit, this.owner, this.repo);
+      await chatBridge.checkInbox();
+      
       // Read context
       const context = await this.readContext();
       console.log(`📄 Context loaded (rev: ${context.rev?.substring(0, 8)}...)`);
