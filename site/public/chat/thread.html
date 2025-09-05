@@ -1,0 +1,18 @@
+<!doctype html><html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat – Thread</title>
+<link rel="stylesheet" href="/chat/app.css">
+</head><body onload="ChatUI.bootThread()">
+  <div class="container">
+    <div class="header">
+      <a class="back" href="/chat/index.html">← Alle Threads</a>
+      <h1 class="thread-title" id="title">Thread</h1>
+    </div>
+    <div class="toolbar">
+      <span class="state" id="state">Lade Nachrichten…</span>
+      <button class="refresh" id="btn-refresh">Aktualisieren</button>
+    </div>
+    <div class="card" id="chat"></div>
+  </div>
+  <script src="/chat/app.js"></script>
+</body></html>
