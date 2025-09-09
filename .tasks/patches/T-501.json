@@ -1,0 +1,21 @@
+{
+  "id": "T-501",
+  "title": "Operator Webhook Server-Mode",
+  "owner": "claude",
+  "status": "todo",
+  "description": "Implementiere einen Express-Webserver für GitHub Webhooks mit HMAC-Verifikation. Route /webhook verarbeitet pull_request Events (opened, labeled, synchronize, reopened) und ruft die bestehende PR-Reader-Logik auf. /health liefert ok.",
+  "acceptance": [
+    "/health -> { ok: true }",
+    "Webhook prüft X-Hub-Signature-256 mit WEBHOOK_SECRET",
+    "Nur erlaubte Owner/Repo/Paths werden verarbeitet",
+    "Label 'to:claude' ist Gate für Chat-PRs",
+    "Idempotenz & Logs vorhanden"
+  ],
+  "output": {
+    "paths": [
+      "tooling/operator/src/server.ts",
+      "tooling/operator/package.json",
+      "docs/webhooks.md"
+    ]
+  }
+}

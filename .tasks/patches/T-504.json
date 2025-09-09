@@ -1,0 +1,20 @@
+{
+  "id": "T-504",
+  "title": "Cron Fallback for Operator",
+  "owner": "claude",
+  "status": "todo",
+  "description": "Implementiere einen Poll-Worker, der periodisch PRs mit Label 'to:claude' verarbeitet, falls der Webhook ausfällt.",
+  "acceptance": [
+    "start:cron Script verfügbar",
+    "Polling-Intervall konfigurierbar (ENV)",
+    "Keine Doppelverarbeitung (Idempotenz)",
+    "Dokumentation des Fallbacks"
+  ],
+  "output": {
+    "paths": [
+      "tooling/operator/src/cron.ts",
+      "tooling/operator/package.json",
+      "docs/cron-fallback.md"
+    ]
+  }
+}
