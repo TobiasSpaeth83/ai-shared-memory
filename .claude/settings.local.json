@@ -40,7 +40,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr merge 12 --merge)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr list --limit 5)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 17 --json title,body)",
-      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 20 --json title,body,url)"
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 20 --json title,body,url)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr create --title \"feat: Webhook operator tasks for always-on service\" --body \"$(cat <<''EOF''\n## 📋 Operator Webhook Tasks (T-501 to T-504)\n\n### Tasks Added\n- **T-501**: Operator Webhook Server-Mode\n  - Express server with `/webhook` and `/health` endpoints\n  - HMAC signature verification\n  - Pull request event processing\n  \n- **T-502**: Deploy Operator to Render\n  - Deployment documentation\n  - Environment variable configuration\n  - Health check setup\n  \n- **T-503**: Configure GitHub Webhook\n  - Webhook setup documentation\n  - Secret synchronization\n  - Testing procedures\n  \n- **T-504**: Cron Fallback (optional)\n  - Polling worker implementation\n  - Configurable intervals\n  - Idempotency handling\n\n### Chat Messages\nAdded 4 chat messages from ChatGPT requesting task implementation in `ops` thread.\n\n### Implementation Plan\n1. Operator will process these tasks via `to:claude` label\n2. Express server enables real-time PR processing\n3. Render deployment ensures 24/7 availability\n4. Cron fallback provides resilience\n\n---\n\n**Note**: These tasks enable the operator to run as an always-on service, processing PRs in seconds instead of requiring manual runs.\n\nEOF\n)\" --base main --label \"to:claude\")"
     ],
     "deny": [],
     "ask": []
