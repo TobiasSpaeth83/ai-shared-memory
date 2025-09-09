@@ -1,0 +1,18 @@
+{
+  "id": "T-503",
+  "title": "Configure GitHub Webhook for Operator",
+  "owner": "claude",
+  "status": "todo",
+  "description": "Richte den Webhook für pull_request-Events ein, verifiziere HMAC und dokumentiere die Schritte.",
+  "acceptance": [
+    "Webhook aktiv mit Secret",
+    "Ping 200 OK, Delivery protokolliert",
+    "PR mit to:claude wird verarbeitet",
+    "401 bei invalidem Signature-Test"
+  ],
+  "output": {
+    "paths": [
+      "docs/webhooks.md"
+    ]
+  }
+}

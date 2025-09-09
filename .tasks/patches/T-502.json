@@ -1,0 +1,18 @@
+{
+  "id": "T-502",
+  "title": "Deploy Operator to Render",
+  "owner": "claude",
+  "status": "todo",
+  "description": "Dokumentiere und automatisiere das Deployment des Operator-Webhooks als Render Web Service (Root tooling/operator).",
+  "acceptance": [
+    "Dokumentation unter docs/deploy-operator-render.md",
+    "ENV-Liste mit Beschreibung und Sicherheits-Hinweisen",
+    "Healthcheck-URL dokumentiert",
+    "Start/Build Kommandos geprüft"
+  ],
+  "output": {
+    "paths": [
+      "docs/deploy-operator-render.md"
+    ]
+  }
+}
