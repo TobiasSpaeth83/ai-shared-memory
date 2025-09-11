@@ -47,7 +47,9 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 23 --json state,mergeable)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr list --limit 10)",
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 13 --json title,body,state,author)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 24 --json state,mergeable,statusCheckRollup)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []
