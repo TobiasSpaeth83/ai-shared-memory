@@ -1,8 +1,8 @@
 # 🚀 NEXT_CHAT.md - Sofort-Einstieg für nächste Claude Session
 
 **KRITISCH**: Diese Datei IMMER als ERSTES lesen bei Session-Start!
-**Stand**: 2025-09-02 14:45
-**Letzter Commit**: 2504bc8
+**Stand**: 2025-09-06 18:30
+**Letzter Commit**: Webhook Implementation gemerged
 
 ## ⚡ SOFORT-BEFEHLE bei Session-Start
 
@@ -20,253 +20,216 @@ cat next_chat.md  # Diese Datei!
 # Falls nicht → Claude Code neu starten!
 ```
 
-## 📚 PFLICHT-LEKTÜRE in dieser Reihenfolge
+## 🔴 AKTUELLER STATUS (2025-09-06)
 
-### 1️⃣ Projekt-Kontext verstehen (5 Min)
+### ✅ ERLEDIGTE FEATURES
+- **MCP Server**: Vollständig konfiguriert und getestet
+- **Operator v1.0.0**: Task-Processing implementiert
+- **Chat-Bridge v0.3**: Bidirektionale Kommunikation ChatGPT ↔ Claude
+- **Chat-UI**: Statisches Interface mit Auto-Refresh unter `/chat/`
+- **Webhook Server**: Express Server mit HMAC (T-501) ✅
+- **Deployment Docs**: Render Guide (T-502) ✅
+- **Webhook Config**: Setup Guide (T-503) ✅
+- **Cron Fallback**: Polling als Backup (T-504) ✅
+
+### 🚀 NÄCHSTE SCHRITTE
+
+#### 1. Webhook Deployment auf Render
 ```bash
-# Hauptdokumentation - Was ist das Projekt?
-cat CLAUDE.md
+# Dokumentation vorhanden:
+cat docs/deploy-operator-render.md
 
-# Aktueller Projekt-Status - Welche Tasks gibt es?
-cat memory/context.json | jq '.'
-
-# Dokumentations-Index - Wo finde ich was?
-cat docs/DOCUMENTATION_INDEX.md
+# Was zu tun ist:
+1. Render Account erstellen/einloggen
+2. Neuen Web Service anlegen
+3. ENV Variablen setzen (siehe Doku)
+4. Deploy und Health Check prüfen
 ```
 
-### 2️⃣ Letzte Session verstehen (3 Min)
+#### 2. GitHub Webhook einrichten
 ```bash
-# Was wurde zuletzt gemacht?
-cat docs/development/SESSION_2025-09-02.md
+# Dokumentation vorhanden:
+cat docs/webhooks-operator.md
 
-# Welche Anweisungen gibt es für heute?
-cat docs/guides/Anweisungen_next_chat.md
+# Schritte:
+1. Webhook Secret generieren: openssl rand -hex 32
+2. In GitHub Settings → Webhooks → Add webhook
+3. URL: https://[deine-render-url].onrender.com/webhook
+4. Events: Pull requests only
+5. Secret eintragen
 ```
 
-### 3️⃣ Technische Details (wenn relevant)
+#### 3. End-to-End Test
 ```bash
-# MCP Server Status und Konfiguration
-cat docs/tools/MCP_GITHUB_SERVER.md
-
-# Claude Settings - Wie ist Claude konfiguriert?
-cat .claude/settings.json
-
-# GitHub App Credentials Status
-ls -la *.pem  # Private Key sollte da sein
-cat tooling/github-mcp/.env | grep -v KEY  # Credentials (ohne Key anzeigen)
-```
-
-## 🔴 AKTUELLER STATUS
-
-### Git/GitHub
-- **Branch**: `feat/web/landing` (3 commits ahead of main)
-- **PR #3**: https://github.com/TobiasSpaeth83/ai-shared-memory/pull/3
-  - Status: Open, Ready for Review
-  - Failing Checks: 2 (nicht kritisch - Schema & Secret Scan)
-  - Kann gemerged werden mit Admin Override
-
-### MCP Server
-- **Status**: ✅ Konfiguriert und lauffähig
-- **Location**: `tooling/github-mcp/dist/index.js`
-- **Credentials**: Vollständig in `.env` konfiguriert
-- **Private Key**: `ai-memory-sync-tobias.2025-09-01.private-key.pem`
-
-### Offene Tasks aus context.json
-```json
+# Test-PR mit Chat-Message erstellen:
+cat > .chat/inbox/from-chatgpt/webhook-test.json << 'EOF'
 {
-  "id": "T-101",
-  "title": "Create landing.html",
-  "owner": "claude",
-  "status": "todo"  // Eigentlich done, PR erstellt
+  "from": "chatgpt",
+  "to": "claude",
+  "type": "chat",
+  "thread": "test",
+  "text": "Webhook Test - bitte antworten!",
+  "ts": "2025-09-06T18:00:00Z"
 }
+EOF
+
+# PR erstellen mit Label "to:claude"
+# Operator sollte automatisch antworten!
 ```
 
-## 🎯 SOFORT-TODOS
+### 📊 Projekt-Fortschritt
 
-### Priorität 1: Cleanup & Merge
+**Implementierte Komponenten**:
+- ✅ MCP-GitHub Integration
+- ✅ Operator Agent (Pull & Push Mode)
+- ✅ Chat-Bridge für AI-Kommunikation
+- ✅ Static Chat-UI mit Auto-Refresh
+- ✅ Webhook Server für Real-time Processing
+- ✅ Cron Fallback für Redundanz
+- ✅ Vollständige Dokumentation
+
+**Noch offen**:
+- ⏳ Webhook auf Render deployen
+- ⏳ GitHub Webhook konfigurieren
+- ⏳ Production Testing
+- ⏳ Monitoring Setup
+
+## 📚 WICHTIGE DATEIEN
+
+### Neue Dokumentation (LESEN!)
 ```bash
-# 1. PR #3 Status checken
-"/c/Program Files/GitHub CLI/gh.exe" pr view 3
+# Webhook & Deployment
+cat docs/webhooks-operator.md      # Webhook Setup Guide
+cat docs/deploy-operator-render.md  # Render Deployment
+cat docs/cron-fallback.md          # Backup Polling
 
-# 2. Optional: Failing Checks fixen
-# - Schema Validation debuggen
-# - Secret Scan false positives
-
-# 3. Task T-101 Status updaten
-# In memory/context.json: status von "todo" auf "completed"
+# Chat-UI
+ls site/public/chat/                # Static Chat Interface
 ```
 
-### Priorität 2: MCP Server aktivieren
+### Operator Code
 ```bash
-# Falls MCP nicht verbunden:
-1. Claude Code komplett schließen
-2. cd tooling/github-mcp && node dist/index.js  # Test
-3. Claude Code neu starten
-4. Tippe "/" - sollte GitHub Tools zeigen
+# Neue Server-Komponenten
+cat tooling/operator/src/server.ts  # Webhook Server
+cat tooling/operator/src/cron.ts    # Cron Worker
+cat tooling/operator/src/chat-bridge.ts  # Enhanced mit PR reading
+
+# Package updates
+cat tooling/operator/package.json   # New scripts: start:web, start:cron
 ```
 
-### Priorität 3: Neue Features
-- Operator Agent aktivieren (automatische Task-Abarbeitung)
-- Weitere Tasks in context.json definieren
-- WebSocket für Real-time Updates
+## 🛠️ BEFEHLE FÜR OPERATOR
 
-## 🛠️ WICHTIGE BEFEHLE
-
-### GitHub CLI (gh)
+### Lokaler Test
 ```bash
-# gh ist NICHT global, verwende vollen Pfad:
-alias gh='"/c/Program Files/GitHub CLI/gh.exe"'
-
-# PR Management
-gh pr list
-gh pr view 3
-gh pr checks 3
-gh pr merge 3  # Nach Review
-```
-
-### MCP Server
-```bash
-# Build & Test
-cd tooling/github-mcp
+cd tooling/operator
+npm install
 npm run build
-node test-token.js  # Token Test
 
-# Server manuell starten (für Debug)
-node dist/index.js
+# Webhook Server starten
+npm run start:web
+# → http://localhost:3000/health
+
+# Oder Cron Worker
+npm run start:cron
 ```
 
-### Git Workflow
+### Webhook Test mit ngrok
 ```bash
-# Feature Branch Workflow
-git checkout -b feat/[name]
-git add -A
-git commit -m "type: description"
-git push -u origin feat/[name]
-gh pr create
+# ngrok installieren
+npm install -g ngrok
+
+# Lokalen Server exposen
+ngrok http 3000
+# → Nutze ngrok URL für GitHub Webhook Test
 ```
 
-## ⚠️ BEKANNTE PROBLEME & FIXES
+## 📋 AKTUELLE TASKS & PRs
 
-### Problem 1: MCP Server verbindet nicht
+### Offene PRs
 ```bash
-# Fix:
-1. Claude Code schließen
-2. cd tooling/github-mcp
-3. npm install  # Falls node_modules fehlt
-4. npm run build
-5. node dist/index.js  # Sollte ohne Fehler laufen
-6. Claude Code neu starten
+# Check aktuelle PRs
+"/c/Program Files/GitHub CLI/gh.exe" pr list
+
+# Wichtige gemergete PRs:
+# - PR #21: Static Chat-UI ✅
+# - PR #22: Webhook Tasks (T-501 bis T-504) ✅
+# - PR #23: Webhook Implementation ✅
 ```
 
-### Problem 2: gh Command not found
+### Tasks in Pipeline
+- Webhook Deployment auf Render
+- GitHub Webhook Configuration
+- Production Testing mit echten Chat-Messages
+- Monitoring & Alerting Setup
+
+## ⚠️ WICHTIGE HINWEISE
+
+### Credentials & Secrets
 ```bash
-# Fix: Immer vollen Pfad verwenden
-"/c/Program Files/GitHub CLI/gh.exe" [command]
-# Oder Alias setzen (siehe oben)
+# GitHub App Credentials
+App ID: 1878945
+Installation ID: 83805063
+Private Key: ai-memory-sync-tobias.2025-09-01.private-key.pem
+
+# NIEMALS committen:
+- *.pem files
+- .env files
+- WEBHOOK_SECRET
 ```
 
-### Problem 3: CI Checks failing
-```bash
-# Nicht kritisch! MCP Server läuft trotzdem
-# Details: cat docs/troubleshooting/CI_CHECKS_FAILING.md
+### ENV Variables für Deployment
+```env
+WEBHOOK_SECRET=<generate with: openssl rand -hex 32>
+GITHUB_APP_ID=1878945
+GITHUB_INSTALLATION_ID=83805063
+GITHUB_PRIVATE_KEY=<base64 encoded private key>
+PORT=10000  # Render default
+NODE_ENV=production
 ```
 
-## 📂 PROJEKT-STRUKTUR ÜBERSICHT
-
-```
-ai-shared-memory/
-├── 📝 CLAUDE.md                    # Hauptdoku
-├── 📝 next_chat.md                 # DIESE DATEI!
-├── 📂 .claude/
-│   ├── settings.json              # MCP Config ✅
-│   └── agents/                    # Sub-Agents ✅
-├── 📂 docs/
-│   ├── DOCUMENTATION_INDEX.md     # Master-Index
-│   ├── guides/
-│   │   └── Anweisungen_next_chat.md  # Detaillierte Anweisungen
-│   ├── tools/
-│   │   └── MCP_GITHUB_SERVER.md   # Server Docs
-│   └── development/
-│       └── SESSION_2025-09-02.md  # Letzte Session
-├── 📂 memory/
-│   └── context.json               # Shared Memory (Tasks!)
-├── 📂 tooling/
-│   └── github-mcp/                # MCP Server ✅
-│       ├── dist/index.js          # Compiled Server
-│       ├── .env                   # Credentials (NICHT committen!)
-│       └── test-token.js          # Test Script
-├── 📂 web/
-│   ├── landing.html               # Task T-101 ✅
-│   ├── style.css                  # ✅
-│   └── script.js                  # ✅
-└── 🔑 *.private-key.pem           # GitHub App Key (NICHT committen!)
-```
-
-## 🔥 QUICK START COMMANDS
+## 🔥 QUICK START für nächste Session
 
 ```bash
-# Kopiere diese Commands für schnellen Start:
+# 1. Git Status
+git pull origin main
+git status
 
-# 1. Status Check
-pwd && git status && git branch
+# 2. Operator Status
+cd tooling/operator
+npm run build
+npm run start:web  # Test lokal
 
-# 2. Projekt verstehen
-cat CLAUDE.md | head -50
+# 3. Check Deployment Docs
+cat docs/deploy-operator-render.md | head -50
 
-# 3. Tasks checken
-cat memory/context.json | grep -A3 '"owner": "claude"'
-
-# 4. MCP Test (optional)
-cd tooling/github-mcp && node test-token.js && cd ../..
-
-# 5. PR Status
-"/c/Program Files/GitHub CLI/gh.exe" pr view 3
+# 4. PR Status
+"/c/Program Files/GitHub CLI/gh.exe" pr list --limit 5
 ```
 
-## 📝 DOKUMENTATIONS-PFLICHT
+## 📝 SESSION-ENDE CHECKLISTE
 
-### Bei Session-Ende IMMER:
-1. **Session-Log erstellen**: `docs/development/SESSION_YYYY-MM-DD.md`
-2. **Diese Datei updaten**: `next_chat.md` mit neuem Status
-3. **Anweisungen updaten**: `docs/guides/Anweisungen_next_chat.md`
-4. **Index pflegen**: `docs/DOCUMENTATION_INDEX.md`
-5. **Committen**: Alle Änderungen
+Bei Session-Ende IMMER:
+- [ ] Session-Log erstellen: `docs/development/SESSION_2025-09-06.md`
+- [ ] Diese Datei updaten: `next_chat.md`
+- [ ] Wichtige Änderungen committen
+- [ ] PR erstellen wenn nötig
 
-### Dokumentations-Regeln
-```bash
-# Vollständige Regeln hier:
-cat docs/guides/CLAUDE_DOCUMENTATION_RULES.md
-```
+## 🎯 MISSION STATUS
 
-## 🎯 MISSION STATEMENT
+**Projekt**: AI Shared Memory - Always-On Operator
+**Phase**: Webhook Deployment Ready
+**Nächster Milestone**: Production Deployment auf Render
 
-**Projekt**: AI Shared Memory - Multi-AI Kollaboration via GitHub
-**Rolle**: Claude als Primary Developer mit MCP Server Integration
-**Ziel**: Tasks aus context.json automatisiert abarbeiten und PRs erstellen
-
-## ✅ CHECKLISTE für produktiven Start
-
-- [ ] next_chat.md gelesen (diese Datei)
-- [ ] CLAUDE.md verstanden
-- [ ] memory/context.json auf Tasks geprüft
-- [ ] MCP Server Status gecheckt (unten rechts in Claude Code)
-- [ ] Git Branch Status klar
-- [ ] PR #3 Status bekannt
-- [ ] Offene Tasks identifiziert
-
-## 🚨 NOTFALL-KONTAKTE
-
-- **Repository**: https://github.com/TobiasSpaeth83/ai-shared-memory
-- **PR #3**: https://github.com/TobiasSpaeth83/ai-shared-memory/pull/3
-- **GitHub App ID**: 1878945
-- **Installation ID**: 83805063
+Der Operator ist **feature-complete** und bereit für 24/7 Betrieb! 
+Nächster Schritt: Deployment und Webhook-Konfiguration für automatische PR-Verarbeitung.
 
 ---
 
-**REMEMBER**: 
-1. Diese Datei (`next_chat.md`) IMMER zuerst lesen
-2. MCP Server muss verbunden sein (Claude Code Neustart wenn nicht)
-3. Alle Änderungen via PR (nie direkt zu main)
-4. Dokumentation ist Pflicht (Schema beachten)
+**WICHTIG FÜR NÄCHSTE SESSION**:
+1. Diese Datei (`next_chat.md`) zuerst lesen ✅
+2. Webhook Deployment Status prüfen
+3. Falls deployed: End-to-End Test durchführen
+4. Chat-UI unter `/chat/` checken für Messages
 
-**VIEL ERFOLG! Die Infrastruktur steht, jetzt kann entwickelt werden! 🚀**
+**Der Operator wartet auf sein Deployment! 🚀**

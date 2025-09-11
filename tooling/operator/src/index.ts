@@ -435,3 +435,7 @@ async function main() {
 }
 
 main().catch(console.error);
+
+// Export for use in server.ts and cron.ts
+export { OperatorAgent };
+export { ChatBridge } from './chat-bridge.js';

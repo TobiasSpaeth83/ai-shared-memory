@@ -1,5 +1,4 @@
-import { OperatorAgent } from './index.js';
-import { ChatBridge } from './chat-bridge.js';
+import { OperatorAgent, ChatBridge } from './index.js';
 
 // Polling interval from env or default to 60 seconds
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '60000');
@@ -68,7 +67,9 @@ async function pollForPRs(): Promise<void> {
           operator['repo']
         );
         
-        await chatBridge.processMessageFromPR(pr);
+        // Use the public wrapper method
+        const prLabels = pr.labels?.map((label: any) => label.name) || [];
+        await chatBridge.handlePRMessage(pr.number, files, prLabels);
         processedPRs.add(pr.number);
         console.log(`  ✅ PR #${pr.number} processed successfully`);
         
