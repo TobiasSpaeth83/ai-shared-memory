@@ -1,7 +1,6 @@
 import express from 'express';
 import { createHmac } from 'crypto';
-import { ChatBridge } from './chat-bridge.js';
-import { OperatorAgent } from './index.js';
+import { OperatorAgent, ChatBridge } from './index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -121,7 +120,10 @@ async function processPRAsync(pr: any): Promise<void> {
       operator['repo']
     );
     
-    await chatBridge.processMessageFromPR(pr);
+    // Use the public wrapper method
+    const prFiles = await fetchPRFiles(pr);
+    const prLabels = pr.labels?.map((label: any) => label.name) || [];
+    await chatBridge.handlePRMessage(pr.number, prFiles, prLabels);
     console.log(`✅ PR #${pr.number} processed successfully`);
   } catch (error) {
     console.error(`❌ Failed to process PR #${pr.number}:`, error);

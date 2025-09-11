@@ -90,6 +90,20 @@ export class ChatBridge {
     }
   }
 
+  // Public wrapper for server.ts and cron.ts
+  public async handlePRMessage(prNumber: number, files: any[], labels: string[]): Promise<void> {
+    // Create a PR object that matches what processMessageFromPR expects
+    const pr = {
+      number: prNumber,
+      title: `PR #${prNumber}`,
+      labels: labels.map(label => ({ name: label })),
+      head: { ref: 'unknown' } // This will be fetched if needed
+    };
+    
+    // Process the PR
+    return this.processMessageFromPR(pr);
+  }
+
   private async processMessageFromPR(pr: any): Promise<void> {
     console.log(`\n📨 Processing PR #${pr.number}: ${pr.title}`);
     
