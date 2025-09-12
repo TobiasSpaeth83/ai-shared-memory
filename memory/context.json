@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "last_updated": "2025-09-03T11:50:00Z",
-  "last_updated_by": "claude",
+  "last_updated": "2025-09-05T15:38:00.220Z",
+  "last_updated_by": "operator-agent",
   "project": {
     "name": "finanzplan_agent",
     "state": "implementation",
@@ -12,7 +12,11 @@
     "repository": "ai-shared-memory"
   },
   "decisions": [
-    { "date": "2025-09-01", "title": "GitHub Kollab-Layer / Plattform SoT", "adr": "docs/adr/0001-github-kollab-layer.md" }
+    {
+      "date": "2025-09-01",
+      "title": "GitHub Kollab-Layer / Plattform SoT",
+      "adr": "docs/adr/0001-github-kollab-layer.md"
+    }
   ],
   "tasks": [
     {
@@ -27,13 +31,16 @@
       "id": "T-202",
       "title": "Warum deterministische Finanzplanung?",
       "owner": "claude",
-      "status": "todo",
+      "status": "in_progress",
       "description": "Schreibe einen bloggeartikel auf Deutsch mit dem Titel \"Warum deterministische Finanzplanung?\" als statische HTML unter site/public/blog/warum-deterministische-finanzplanung.html",
       "output": {
         "path": "site/public/blog/warum-deterministische-finanzplanung.html",
         "format": "html",
         "preview": "render"
-      }
+      },
+      "pr_number": 13
     }
-  ]
+  ],
+  "rev": "94e8f5b28562e5dbab2a7769e7ef3b30d0d5fa9bc2243807999ff7b6982ca119",
+  "sha": "c05726be92b0952a604db53c3cbe44a64d8418d0"
 }
