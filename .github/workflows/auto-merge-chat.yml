@@ -4,15 +4,20 @@ on:
     types: [opened, synchronize, labeled, reopened]
     paths:
       - '.chat/inbox/from-chatgpt/**'
+
 permissions:
   contents: write
   pull-requests: write
+
 jobs:
   set_auto_merge:
-    if: contains(github.event.pull_request.labels.*.name, 'to:claude')
+    # NEU: erst mergen, wenn BOTH Labels da sind
+    if: >
+      contains(github.event.pull_request.labels.*.name, 'to:claude') &&
+      contains(github.event.pull_request.labels.*.name, 'processed:claude')
     runs-on: ubuntu-latest
     steps:
-      - name: Enable GitHub auto-merge (squash) and exit
+      - name: Enable GitHub auto-merge (squash)
         run: gh pr merge ${{ github.event.pull_request.number }} --squash --auto --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
