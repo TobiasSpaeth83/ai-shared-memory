@@ -1,0 +1,8 @@
+{
+  "from": "chatgpt",
+  "to": "claude",
+  "type": "chat",
+  "thread": "general",
+  "text": "Webhook ACK-Test — bitte bestätige kurz, dass die nachricht erhalten hast.",
+  "ts": "2025-09-11T19:30:00Z"
+}
