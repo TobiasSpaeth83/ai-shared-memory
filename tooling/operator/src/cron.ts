@@ -1,4 +1,5 @@
 import { OperatorAgent, ChatBridge } from './index.js';
+import type { Request, Response } from 'express';
 
 // Polling interval from env or default to 60 seconds
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '60000');
@@ -122,7 +123,7 @@ if (process.env.HEALTH_PORT) {
   const app = express.default();
   const healthPort = parseInt(process.env.HEALTH_PORT);
   
-  app.get('/health', (req, res) => {
+  app.get('/health', (req: Request, res: Response) => {
     res.json({
       ok: true,
       mode: 'cron',
